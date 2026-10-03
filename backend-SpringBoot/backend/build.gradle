@@ -1,0 +1,70 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.8'
+
+	//會自動去找版本號
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.finance'
+version = '0.0.1-SNAPSHOT'
+description = 'Demo project for Spring Boot'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// 啟動 Web 伺服器
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	
+	// JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+	// Gson
+    implementation 'com.google.code.gson:gson:2.10.1'
+    
+    // BCrypt 
+    implementation 'org.mindrot:jbcrypt:0.4'
+
+	// JDBC（資料庫連線） 
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	
+	// MySQL
+	implementation 'com.mysql:mysql-connector-j:9.1.0'
+
+	//驗證api資料輸入
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	//加入這一行可以直接把resporitory變成api
+	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+
+	//加入可以看swagger - ui
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14'
+
+	//lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// DevTools (開發時自動重啟)
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// 為了開發方便，解析 JSON
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+}
+
+

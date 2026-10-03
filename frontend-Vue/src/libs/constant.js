@@ -1,0 +1,33 @@
+const STATUE_LOGIN="login";
+const STATUE_SIGNUP="signup";
+const STATUE_RESETPASSWORD="gotoResetPassword";
+// const STATUE_USERINFO="user";
+
+//使用者
+const STATUE_USER="user"; 
+//管理者 
+const STATUE_ADMIN="admin";
+
+const TOGGLE_HOME ="home";
+const TOGGLE_ADMIN="admin";
+const TOGGLE_PERSONDATA = "personalData";
+const TOGGLE_STOCKANALYZE = "stockAnalyze";
+const TOGGLE_FOREANALYZE = "forexAnalyze";
+const TOGGLE_STRATEGY="investmentStrategy";
+
+
+const CONST={STATUE_LOGIN:STATUE_LOGIN,
+            STATUE_SIGNUP:STATUE_SIGNUP,
+            STATUE_RESETPASSWORD:STATUE_RESETPASSWORD,
+            // STATUE_USERINFO:STATUE_USERINFO,
+            TOGGLE_PERSONDATA:TOGGLE_PERSONDATA,
+            TOGGLE_STOCKANALYZE:TOGGLE_STOCKANALYZE,
+            TOGGLE_FOREANALYZE:TOGGLE_FOREANALYZE,
+            TOGGLE_STRATEGY:TOGGLE_STRATEGY,
+            TOGGLE_ADMIN:TOGGLE_ADMIN,
+            TOGGLE_HOME:TOGGLE_HOME,
+            STATUE_USER:STATUE_USER,
+            STATUE_ADMIN:STATUE_ADMIN
+        }
+
+export{CONST};

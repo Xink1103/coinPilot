@@ -1,0 +1,33 @@
+@import "tailwindcss";
+@plugin "daisyui";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 覆寫 vue3-toastify 的內容樣式 */
+.Toastify__toast-body {
+    /* 將文字顏色改為灰色 */
+    color: #cccccc !important; 
+}
+
+/* 如果您想讓成功通知的綠色標題也變灰色，可以加上這個 */
+/* 這是針對深色模式下成功通知的覆寫 */
+.Toastify__toast--success {
+    background-color: #1a1a1a !important; /* 確保背景是您想要的黑色調 */
+}
+
+body{
+    font-family: 'Inter', 'Noto Sans TC', sans-serif !important;
+}
+
+.financial-amount-shrink {
+    /* 使用 clamp() 函數來定義字體大小：
+      1. 最小字體大小 
+      2. 響應式字體大小 
+      3. 最大字體大小 
+    */
+    font-size: clamp(2px, 5vw, 40px); 
+    line-height: 1; 
+    white-space: nowrap; 
+    overflow: hidden; 
+}
