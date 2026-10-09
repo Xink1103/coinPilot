@@ -82,11 +82,6 @@ public class UserService {
         return null;
     }
 
-    // 計算用戶數量
-    public int countTotalUsers() {
-        return userDAO.countTotalUsers();
-    }
-
     // 透過 ID 查詢用戶  JWT Token 會用到
     public User findUserById(int userId) {
         if (userId <= 0) {

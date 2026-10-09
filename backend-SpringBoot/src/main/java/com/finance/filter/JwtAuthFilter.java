@@ -82,8 +82,7 @@ public class JwtAuthFilter implements Filter {
                pathWithoutContext.endsWith("/snapshot") ||
                pathWithoutContext.startsWith("/swagger-ui") ||
                pathWithoutContext.startsWith("/v3/api-docs") ||
-               pathWithoutContext.startsWith("/error") ||
-               pathWithoutContext.startsWith("/api/test");
+               pathWithoutContext.startsWith("/error");
     }
 
     //401 error

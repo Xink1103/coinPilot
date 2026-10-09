@@ -28,8 +28,6 @@ public class UserDAO{
     private static final String FIND_BY_EMAIL_SQL = "SELECT * FROM user WHERE userEmail = ?";
     
     private static final String FIND_BY_ID_SQL = "SELECT * FROM user WHERE userId = ?";
-    
-    private static final String COUNT_USERS_SQL = "SELECT COUNT(*) FROM user WHERE userRole != 'ADMIN'";
 
 	//insert
 	public void insert(User user){
@@ -86,19 +84,6 @@ public class UserDAO{
 			return null;
 		}else{
 			return user.get(0);
-		}
-
-	}
-
-	//計算用戶總數
-	public int countTotalUsers(){
-
-		Integer count = jdbcTemplate.queryForObject(COUNT_USERS_SQL, Integer.class);
-
-		if(count!=null){
-			return count;
-		}else{
-			return 0;
 		}
 
 	}
