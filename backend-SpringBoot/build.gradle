@@ -4,6 +4,7 @@ plugins {
 
 	//會自動去找版本號
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.diffplug.spotless' version '8.10.4'
 }
 
 group = 'com.finance'
@@ -13,6 +14,13 @@ description = 'Demo project for Spring Boot'
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+spotless {
+	java {
+		googleJavaFormat().aosp()
+		removeUnusedImports()
 	}
 }
 
@@ -66,5 +74,3 @@ dependencies {
 	// 為了開發方便，解析 JSON
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 }
-
-
