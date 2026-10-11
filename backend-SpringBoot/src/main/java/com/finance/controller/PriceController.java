@@ -1,30 +1,26 @@
 package com.finance.controller;
 
+import com.finance.entity.Asset;
+import com.finance.service.AssetService;
+import com.finance.service.ExternalPriceService;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.finance.entity.Asset;
-import com.finance.service.AssetService;
-import com.finance.service.ExternalPriceService;
-
 @RestController
 @RequestMapping("/api/prices")
 public class PriceController {
 
-    @Autowired
-    private ExternalPriceService externalPriceService;
+    @Autowired private ExternalPriceService externalPriceService;
 
-    @Autowired
-    private AssetService assetService;
+    @Autowired private AssetService assetService;
 
     @GetMapping("/snapshot")
     public ResponseEntity<List<Map<String, Object>>> getSnapshot() {

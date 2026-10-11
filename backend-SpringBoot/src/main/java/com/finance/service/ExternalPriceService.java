@@ -1,5 +1,8 @@
 package com.finance.service;
 
+import com.finance.entity.Asset;
+import com.finance.entity.HistoricalPrice;
+import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -7,40 +10,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.finance.entity.Asset;
-import com.finance.entity.HistoricalPrice;
-
-import jakarta.annotation.PostConstruct;
-
 @Service
 public class ExternalPriceService {
 
-    @Autowired
-    private RestTemplate restTemplate;
+    @Autowired private RestTemplate restTemplate;
 
-    @Autowired
-    private HistoricalPriceService historicalPriceService;
+    @Autowired private HistoricalPriceService historicalPriceService;
 
-    @Autowired
-    private AssetService assetService;
+    @Autowired private AssetService assetService;
 
     @Value("${exchange.rate.api.key}")
     private String apiKey;
 
-    private final String STOCK_URL = "https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_0050.tw|tse_006208.tw|tse_2330.tw|tse_2454.tw|tse_2603.tw|tse_2881.tw|tse_3231.tw&json=1&delay=0";
+    private final String STOCK_URL =
+            "https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_0050.tw|tse_006208.tw|tse_2330.tw|tse_2454.tw|tse_2603.tw|tse_2881.tw|tse_3231.tw&json=1&delay=0";
 
     private final Map<Integer, BigDecimal> priceCache = new ConcurrentHashMap<>();
     private LocalDateTime lastStockUpdateTime = null;
     private LocalDateTime lastForexUpdateTime = null;
 
-    //初始化的時候確定會載入最新的價位
+    // 初始化的時候確定會載入最新的價位
     @PostConstruct
     public void init() {
         System.out.println("ExternalPriceService 初始化 - 開始載入價格");
@@ -48,21 +43,21 @@ public class ExternalPriceService {
         refreshForexPrices();
     }
 
-    //設定股票的更新排程
+    // 設定股票的更新排程
     @Scheduled(cron = "0 */1 9-13 * * MON-FRI")
     public void scheduledStockRefresh() {
         System.out.println("[排程] 台股價格更新 - " + LocalDateTime.now());
         refreshStockPrices();
     }
 
-    //設定外幣的更新排程
+    // 設定外幣的更新排程
     @Scheduled(fixedRate = 30 * 60 * 1000)
     public void scheduledForexRefresh() {
         System.out.println("[排程] 外幣匯率更新 - " + LocalDateTime.now());
         refreshForexPrices();
     }
 
-    //拿到單一價位
+    // 拿到單一價位
     public BigDecimal getPrice(int assetId) {
         BigDecimal price = priceCache.get(assetId);
 
@@ -77,10 +72,10 @@ public class ExternalPriceService {
         return price;
     }
 
-    //拿到全部價位
+    // 拿到全部價位
     public Map<Integer, BigDecimal> getAllPrices() {
         List<Asset> allAssets = assetService.findAll();
-        
+
         for (Asset asset : allAssets) {
             if (!priceCache.containsKey(asset.getAssetId())) {
                 HistoricalPrice hp = historicalPriceService.getRandomPrice(asset.getAssetId());
@@ -93,30 +88,32 @@ public class ExternalPriceService {
         return new HashMap<>(priceCache);
     }
 
-    //除錯用的
+    // 除錯用的
     public Map<String, Object> getCacheStatus() {
         Map<String, Object> status = new HashMap<>();
         status.put("lastStockUpdate", lastStockUpdateTime);
         status.put("lastForexUpdate", lastForexUpdateTime);
         status.put("cacheSize", priceCache.size());
-        
+
         if (lastStockUpdateTime != null) {
-            long elapsedMs = java.time.Duration.between(lastStockUpdateTime, LocalDateTime.now()).toMillis();
+            long elapsedMs =
+                    java.time.Duration.between(lastStockUpdateTime, LocalDateTime.now()).toMillis();
             status.put("stockUpdateSecondsAgo", elapsedMs / 1000);
         }
-        
+
         if (lastForexUpdateTime != null) {
-            long elapsedMs = java.time.Duration.between(lastForexUpdateTime, LocalDateTime.now()).toMillis();
+            long elapsedMs =
+                    java.time.Duration.between(lastForexUpdateTime, LocalDateTime.now()).toMillis();
             status.put("forexUpdateSecondsAgo", elapsedMs / 1000);
         }
-        
+
         return status;
     }
 
-    //把股票API抓到的價位跟資料庫的資產對應
+    // 把股票API抓到的價位跟資料庫的資產對應
     private void refreshStockPrices() {
         Map<String, BigDecimal> stockData = fetchStocksFromApi();
-        
+
         if (stockData.isEmpty()) {
             System.out.println("未取得台股資料（可能非交易時間），保持現有快取");
             return;
@@ -136,10 +133,10 @@ public class ExternalPriceService {
         System.out.println("台股價格更新完成: " + updatedCount + " 筆");
     }
 
-    //把外幣API抓到的價位跟資料庫的資產對應
+    // 把外幣API抓到的價位跟資料庫的資產對應
     private void refreshForexPrices() {
         Map<String, BigDecimal> forexData = fetchForexFromApi();
-        
+
         if (forexData.isEmpty()) {
             System.out.println("未取得外幣資料，保持現有快取");
             return;
@@ -159,7 +156,7 @@ public class ExternalPriceService {
         System.out.println("外幣匯率更新完成: " + updatedCount + " 筆");
     }
 
-    //抓取外幣API的方法
+    // 抓取外幣API的方法
     private Map<String, BigDecimal> fetchForexFromApi() {
         Map<String, BigDecimal> targetPrices = new HashMap<>();
 
@@ -183,7 +180,7 @@ public class ExternalPriceService {
         return targetPrices;
     }
 
-    //抓取台股API的方法
+    // 抓取台股API的方法
     private Map<String, BigDecimal> fetchStocksFromApi() {
         Map<String, BigDecimal> stockPrices = new HashMap<>();
 
@@ -195,7 +192,8 @@ public class ExternalPriceService {
                 return stockPrices;
             }
 
-            List<Map<String, Object>> msgArray = (List<Map<String, Object>>) response.get("msgArray");
+            List<Map<String, Object>> msgArray =
+                    (List<Map<String, Object>>) response.get("msgArray");
 
             if (msgArray == null || msgArray.isEmpty()) {
                 System.err.println("台股 msgArray 為空（可能非交易時間）");
@@ -213,7 +211,9 @@ public class ExternalPriceService {
                 if (zObj != null && !"-".equals(zObj.toString()) && !zObj.toString().isEmpty()) {
                     priceStr = zObj.toString();
                     priceType = "即時價";
-                } else if (yObj != null && !"-".equals(yObj.toString()) && !yObj.toString().isEmpty()) {
+                } else if (yObj != null
+                        && !"-".equals(yObj.toString())
+                        && !yObj.toString().isEmpty()) {
                     priceStr = yObj.toString();
                     priceType = "昨收價";
                 }
@@ -234,7 +234,7 @@ public class ExternalPriceService {
         return stockPrices;
     }
 
-    //轉換數字的方法
+    // 轉換數字的方法
     private BigDecimal calculateToTwd(Object rateObj) {
         if (rateObj == null) return BigDecimal.ZERO;
 

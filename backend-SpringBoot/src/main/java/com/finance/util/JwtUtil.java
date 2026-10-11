@@ -1,19 +1,14 @@
 package com.finance.util;
 
-import java.util.Date;
-
-import javax.crypto.SecretKey;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import com.finance.entity.User;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-
+import java.util.Date;
+import javax.crypto.SecretKey;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtil {
@@ -22,7 +17,7 @@ public class JwtUtil {
     @Value("${jwt.secret:mySecretKey123456789012345678901234567890}")
     private String secretString;
 
-    @Value("${jwt.expiration:432000000}")  // 5 天
+    @Value("${jwt.expiration:432000000}") // 5 天
     private long expirationTimeInstance;
 
     // Static 變數供 static 方法使用
@@ -37,7 +32,7 @@ public class JwtUtil {
         } else {
             SECRET_KEY = Jwts.SIG.HS256.key().build();
         }
-        
+
         EXPIRATION_TIME = this.expirationTimeInstance;
     }
 
@@ -46,19 +41,20 @@ public class JwtUtil {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME);
 
-        String token = Jwts.builder()
-                .claim("userId", user.getUserId())
-                .claim("userRole", user.getUserRole())
-                .subject(String.valueOf(user.getUserId()))
-                .issuedAt(now)
-                .expiration(expiryDate)
-                .signWith(SECRET_KEY)  
-                .compact();
+        String token =
+                Jwts.builder()
+                        .claim("userId", user.getUserId())
+                        .claim("userRole", user.getUserRole())
+                        .subject(String.valueOf(user.getUserId()))
+                        .issuedAt(now)
+                        .expiration(expiryDate)
+                        .signWith(SECRET_KEY)
+                        .compact();
 
         return "Bearer " + token;
     }
 
-    //驗證並解析 JWT Token
+    // 驗證並解析 JWT Token
     public static Claims validateToken(String token) {
         try {
             // 移除 "Bearer " 前綴
@@ -67,10 +63,10 @@ public class JwtUtil {
             }
 
             return Jwts.parser()
-                    .verifyWith(SECRET_KEY)      
+                    .verifyWith(SECRET_KEY)
                     .build()
-                    .parseSignedClaims(token)    
-                    .getPayload();               
+                    .parseSignedClaims(token)
+                    .getPayload();
 
         } catch (Exception e) {
             System.err.println("Token 驗證失敗: " + e.getMessage());

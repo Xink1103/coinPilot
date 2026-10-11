@@ -1,8 +1,10 @@
 package com.finance.controller;
 
+import com.finance.entity.User;
+import com.finance.entity.UserSurvey;
+import com.finance.service.UserSurveyService;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,16 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.finance.entity.User;
-import com.finance.entity.UserSurvey;
-import com.finance.service.UserSurveyService;
-
 @RestController
 @RequestMapping("/api/survey")
 public class UserSurveyController {
 
-    @Autowired
-    private UserSurveyService userSurveyService;
+    @Autowired private UserSurveyService userSurveyService;
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createSurvey(

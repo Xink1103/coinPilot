@@ -1,17 +1,15 @@
 package com.finance.service;
 
+import com.finance.entity.User;
+import com.finance.repository.UserDAO;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.finance.entity.User;
-import com.finance.repository.UserDAO;
-
-@Service 
+@Service
 public class UserService {
 
-    @Autowired
-    private UserDAO userDAO;
+    @Autowired private UserDAO userDAO;
 
     // 註冊邏輯
     public boolean signUp(User user) {

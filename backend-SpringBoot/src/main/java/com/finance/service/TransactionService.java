@@ -1,32 +1,27 @@
 package com.finance.service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.finance.entity.Asset;
 import com.finance.entity.Transaction;
 import com.finance.repository.AssetDAO;
 import com.finance.repository.TransactionDAO;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class TransactionService {
 
-    @Autowired
-    private TransactionDAO transactionDAO;
-    
-    @Autowired
-    private AssetDAO assetDAO;
-    
-    @Autowired
-    private ExternalPriceService externalPriceService; 
+    @Autowired private TransactionDAO transactionDAO;
 
-    //執行下單邏輯
-    public Transaction createTransaction(int userId, int assetId, int surveyId, BigDecimal budgetAmount) 
-            throws Exception {
+    @Autowired private AssetDAO assetDAO;
+
+    @Autowired private ExternalPriceService externalPriceService;
+
+    // 執行下單邏輯
+    public Transaction createTransaction(
+            int userId, int assetId, int surveyId, BigDecimal budgetAmount) throws Exception {
 
         // 取得成交價（市場價 ± 0.5% 波動）
         BigDecimal tradePrice = generateTradePrice(assetId);
@@ -62,7 +57,8 @@ public class TransactionService {
 
         // 補齊當前市價
         BigDecimal currentPrice = externalPriceService.getPrice(assetId);
-        trans.setTransCurrentPrice(currentPrice != null ? currentPrice.setScale(2, RoundingMode.HALF_UP) : tradePrice);
+        trans.setTransCurrentPrice(
+                currentPrice != null ? currentPrice.setScale(2, RoundingMode.HALF_UP) : tradePrice);
 
         // 補齊資產資訊
         Asset assetInfo = assetDAO.findByAssetId(assetId);
@@ -77,7 +73,7 @@ public class TransactionService {
         return trans;
     }
 
-    //取得使用者交易列表
+    // 取得使用者交易列表
     public List<Transaction> getUserTransaction(int userId) {
         List<Transaction> trans = transactionDAO.selectAllByUserId(userId);
 
@@ -92,7 +88,7 @@ public class TransactionService {
         return trans;
     }
 
-    //產生下單時的成交價 市場價 ± 0.5% 隨機波動
+    // 產生下單時的成交價 市場價 ± 0.5% 隨機波動
     private BigDecimal generateTradePrice(int assetId) {
         BigDecimal marketPrice = externalPriceService.getPrice(assetId);
 

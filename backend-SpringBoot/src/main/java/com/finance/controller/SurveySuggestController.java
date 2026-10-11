@@ -1,10 +1,12 @@
 package com.finance.controller;
 
+import com.finance.dto.SurveySuggestRequest;
+import com.finance.entity.SurveySuggest;
+import com.finance.service.SurveySuggestService;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,21 +17,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.finance.dto.SurveySuggestRequest;
-import com.finance.entity.SurveySuggest;
-import com.finance.service.SurveySuggestService;
-
 @RestController
 @RequestMapping("/api/suggest")
 public class SurveySuggestController {
 
-    @Autowired
-    private SurveySuggestService surveySuggestService;
+    @Autowired private SurveySuggestService surveySuggestService;
 
     @PostMapping
-    public ResponseEntity<Map<String,Object>> saveSuggestion (@RequestBody SurveySuggestRequest request){
+    public ResponseEntity<Map<String, Object>> saveSuggestion(
+            @RequestBody SurveySuggestRequest request) {
 
-        Map<String,Object> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
 
         // 驗證 surveyId
         if (request.getSurveyId() == null || request.getSurveyId() <= 0) {
@@ -43,7 +41,7 @@ public class SurveySuggestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
-        for(SurveySuggest suggest : request.getSuggestions()){
+        for (SurveySuggest suggest : request.getSuggestions()) {
 
             suggest.setSurveyId(request.getSurveyId());
 
@@ -59,9 +57,9 @@ public class SurveySuggestController {
                 response.put("message", "sugPercentage 不能為空");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-            
-            if (percentage.compareTo(BigDecimal.ZERO) < 0 || 
-                percentage.compareTo(new BigDecimal("100")) > 0) {
+
+            if (percentage.compareTo(BigDecimal.ZERO) < 0
+                    || percentage.compareTo(new BigDecimal("100")) > 0) {
                 response.put("message", "百分比必須介於 0-100 之間");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
@@ -80,19 +78,18 @@ public class SurveySuggestController {
                 response.put("message", "部分資料儲存失敗");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
             }
-            
+
         } catch (RuntimeException e) {
             e.printStackTrace();
             response.put("message", "儲存失敗：" + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-
     }
 
     @GetMapping
-    public ResponseEntity<Map<String,Object>> getSuggestion(@RequestParam Integer surveyId){
+    public ResponseEntity<Map<String, Object>> getSuggestion(@RequestParam Integer surveyId) {
 
-        Map<String,Object> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
 
         if (surveyId == null || surveyId <= 0) {
             response.put("message", "surveyId 格式錯誤或無效");
@@ -110,13 +107,11 @@ public class SurveySuggestController {
                 response.put("message", "找不到該問卷ID的資產配置建議");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
-            
+
         } catch (RuntimeException e) {
             e.printStackTrace();
             response.put("message", "查詢建議失敗：" + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-
     }
-
 }
