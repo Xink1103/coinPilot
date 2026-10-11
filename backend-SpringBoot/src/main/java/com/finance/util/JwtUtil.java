@@ -73,27 +73,4 @@ public class JwtUtil {
             return null;
         }
     }
-
-    // 從 Token 取得 userId
-    public static Integer getUserIdFromToken(String token) {
-        Claims claims = validateToken(token);
-        if (claims != null) {
-            return claims.get("userId", Integer.class);
-        }
-        return null;
-    }
-
-    // 從 Token 取得 userRole
-    public static String getUserRoleFromToken(String token) {
-        Claims claims = validateToken(token);
-        if (claims != null) {
-            return claims.get("userRole", String.class);
-        }
-        return null;
-    }
-
-    // 檢查 Token 是否有效
-    public static boolean isTokenValid(String token) {
-        return validateToken(token) != null;
-    }
 }

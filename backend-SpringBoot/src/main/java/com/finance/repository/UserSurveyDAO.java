@@ -31,13 +31,6 @@ public class UserSurveyDAO {
 
     private static final String DELETE_BY_USER_ID = "DELETE FROM usersurvey WHERE userId = ?";
 
-    private static final String FIND_DOMINANT_LEVEL_QUERY =
-            "SELECT surveyLevel, COUNT(*) as count "
-                    + "FROM usersurvey "
-                    + "GROUP BY surveyLevel "
-                    + "ORDER BY count DESC "
-                    + "LIMIT 1";
-
     // insert
     public int insert(UserSurvey survey) {
 
@@ -100,15 +93,5 @@ public class UserSurveyDAO {
     // 刪除問卷
     public int deleteByUserId(int userId) {
         return jdbcTemplate.update(DELETE_BY_USER_ID, userId);
-    }
-
-    // 統計問卷傾向
-    public String findSurveyLevel() {
-        try {
-            String result = jdbcTemplate.queryForObject(FIND_DOMINANT_LEVEL_QUERY, String.class);
-            return result;
-        } catch (Exception e) {
-            return null;
-        }
     }
 }

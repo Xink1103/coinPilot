@@ -1,11 +1,9 @@
 package com.finance;
 
-import com.finance.filter.JwtAuthFilter;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -47,13 +45,5 @@ public class financeSystemApplication {
                 .add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
 
         return restTemplate;
-    }
-
-    public FilterRegistrationBean<JwtAuthFilter> jwtAuthFilter(JwtAuthFilter jwtAuthFilter) {
-        FilterRegistrationBean<JwtAuthFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(jwtAuthFilter);
-        registrationBean.addUrlPatterns("/api/*");
-        registrationBean.setOrder(1);
-        return registrationBean;
     }
 }

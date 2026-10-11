@@ -49,9 +49,4 @@ public class UserSurveyService {
             throw e;
         }
     }
-
-    // 取得整體風險傾向（管理頁面用）
-    public String findDominantSurveyLevel() {
-        return userSurveyDAO.findSurveyLevel();
-    }
 }
