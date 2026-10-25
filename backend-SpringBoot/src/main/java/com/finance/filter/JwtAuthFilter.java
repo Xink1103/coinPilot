@@ -12,6 +12,8 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,26 +21,26 @@ import org.springframework.stereotype.Component;
 public class JwtAuthFilter implements Filter {
 
     @Autowired private UserService UserService;
+    private static final Set<String> PUBLIC_ENDPOINTS =
+            Set.of("POST /api/users/login", "POST /api/users/signup", "GET /api/prices/snapshot");
+    private static final List<String> PUBLIC_PREFIXES =
+            List.of("/swagger-ui", "/v3/api-docs", "/error");
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        String requestURI = httpRequest.getRequestURI();
-        String method = httpRequest.getMethod();
-
         // 過濾白名單
-        if (shouldSkipFilter(requestURI, method)) {
+        if (shouldSkipFilter(httpRequest)) {
             chain.doFilter(httpRequest, httpResponse);
             return;
         }
 
         String authHeader = httpRequest.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            sendAuthorizationResponse(httpResponse, "未提共有效的token");
+            sendAuthorizationResponse(httpResponse, "未提供有效的token");
             return;
         }
 
@@ -61,25 +63,21 @@ public class JwtAuthFilter implements Filter {
         }
 
         httpRequest.setAttribute("validateUser", validateUser);
-
         chain.doFilter(request, response);
     }
 
     // 輔助方法過濾名單
-    public boolean shouldSkipFilter(String uri, String method) {
+    private boolean shouldSkipFilter(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        String apiPath = uri.substring(contextPath.length());
+        String method = request.getMethod();
         if ("OPTIONS".equalsIgnoreCase(method)) {
             return true;
         }
-
-        // 因為有 context path，所以 URI 會是 /finanace_system/api/
-        String pathWithoutContext = uri.replaceFirst("^/finanace_system", "");
-
-        return pathWithoutContext.endsWith("/login")
-                || pathWithoutContext.endsWith("/signup")
-                || pathWithoutContext.endsWith("/snapshot")
-                || pathWithoutContext.startsWith("/swagger-ui")
-                || pathWithoutContext.startsWith("/v3/api-docs")
-                || pathWithoutContext.startsWith("/error");
+        // 精確比對 method + apiPath，或符合公開前綴
+        return PUBLIC_ENDPOINTS.contains(method + " " + apiPath)
+                || PUBLIC_PREFIXES.stream().anyMatch(prefix -> apiPath.startsWith(prefix));
     }
 
     // 401 error
