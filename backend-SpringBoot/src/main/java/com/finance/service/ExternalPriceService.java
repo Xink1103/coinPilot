@@ -10,12 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 @Service
 public class ExternalPriceService {
 
@@ -38,7 +40,7 @@ public class ExternalPriceService {
     // 初始化的時候確定會載入最新的價位
     @PostConstruct
     public void init() {
-        System.out.println("ExternalPriceService 初始化 - 開始載入價格");
+        log.info("ExternalPriceService 初始化 - 開始載入價格");
         refreshStockPrices();
         refreshForexPrices();
     }
@@ -46,14 +48,14 @@ public class ExternalPriceService {
     // 設定股票的更新排程
     @Scheduled(cron = "0 */1 9-13 * * MON-FRI")
     public void scheduledStockRefresh() {
-        System.out.println("[排程] 台股價格更新 - " + LocalDateTime.now());
+        log.info("[排程] 台股價格更新");
         refreshStockPrices();
     }
 
     // 設定外幣的更新排程
     @Scheduled(fixedRate = 30 * 60 * 1000)
     public void scheduledForexRefresh() {
-        System.out.println("[排程] 外幣匯率更新 - " + LocalDateTime.now());
+        log.info("[排程] 外幣匯率更新");
         refreshForexPrices();
     }
 
@@ -115,7 +117,7 @@ public class ExternalPriceService {
         Map<String, BigDecimal> stockData = fetchStocksFromApi();
 
         if (stockData.isEmpty()) {
-            System.out.println("未取得台股資料（可能非交易時間），保持現有快取");
+            log.info("未取得台股資料（可能非交易時間），保持現有快取");
             return;
         }
 
@@ -130,7 +132,7 @@ public class ExternalPriceService {
         }
 
         lastStockUpdateTime = LocalDateTime.now();
-        System.out.println("台股價格更新完成: " + updatedCount + " 筆");
+        log.info("台股價格更新完成 : {} 筆", updatedCount);
     }
 
     // 把外幣API抓到的價位跟資料庫的資產對應
@@ -138,7 +140,7 @@ public class ExternalPriceService {
         Map<String, BigDecimal> forexData = fetchForexFromApi();
 
         if (forexData.isEmpty()) {
-            System.out.println("未取得外幣資料，保持現有快取");
+            log.info("未取得外幣資料，保持現有快取");
             return;
         }
 
@@ -153,7 +155,7 @@ public class ExternalPriceService {
         }
 
         lastForexUpdateTime = LocalDateTime.now();
-        System.out.println("外幣匯率更新完成: " + updatedCount + " 筆");
+        log.info("外幣匯率更新完成 : {} 筆", updatedCount);
     }
 
     // 抓取外幣API的方法
@@ -171,7 +173,7 @@ public class ExternalPriceService {
                 targetPrices.put("JPY", calculateToTwd(rates.get("JPY")));
                 targetPrices.put("USD", calculateToTwd(rates.get("USD")));
 
-                System.out.println("外幣匯率抓取成功");
+                log.info("外幣匯率抓取成功");
             }
         } catch (Exception e) {
             System.err.println("外幣 API 失敗: " + e.getMessage());
@@ -221,11 +223,10 @@ public class ExternalPriceService {
                 if (priceStr != null) {
                     BigDecimal price = new BigDecimal(priceStr).setScale(2, RoundingMode.HALF_UP);
                     stockPrices.put(code, price);
-                    System.out.println("  " + code + " = " + price + " (" + priceType + ")");
+                    log.debug(" {} = {} ({})", code, price, priceType);
                 }
             }
-
-            System.out.println("台股抓取成功: " + stockPrices.size() + " 檔");
+            log.info("台股抓取成功 : {} 檔", stockPrices.size());
 
         } catch (Exception e) {
             System.err.println("台股 API 失敗: " + e.getMessage());
