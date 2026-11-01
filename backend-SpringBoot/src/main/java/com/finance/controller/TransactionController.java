@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/transactions")
 public class TransactionController {
@@ -69,7 +71,7 @@ public class TransactionController {
             response.put("message", "參數格式錯誤：" + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("新增交易失敗", e);
             response.put("message", "伺服器內部錯誤：" + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
@@ -122,7 +124,7 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.OK).body(transactionList);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("查詢交易紀錄失敗", e);
             response.put("message", "查詢失敗：伺服器內部錯誤");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }

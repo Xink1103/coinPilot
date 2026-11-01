@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/suggest")
 public class SurveySuggestController {
@@ -80,7 +82,7 @@ public class SurveySuggestController {
             }
 
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            log.error("儲存資產建議失敗", e);
             response.put("message", "儲存失敗：" + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
@@ -109,7 +111,7 @@ public class SurveySuggestController {
             }
 
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            log.error("查詢資產建議失敗", e);
             response.put("message", "查詢建議失敗：" + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
