@@ -5,6 +5,7 @@ import com.finance.service.UserService;
 import com.finance.util.JwtUtil;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -48,7 +50,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(response);
             } else {
                 // 註冊成功但查詢失敗
-                System.err.println("註冊成功但無法查詢到使用者: " + user.getUserEmail());
+                log.error("註冊成功但無法查詢到使用者: {}", user.getUserEmail());
                 response.put("message", "註冊成功，但伺服器內部錯誤，無法登入。");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
             }

@@ -5,6 +5,7 @@ import com.finance.entity.User;
 import com.finance.service.AdminService;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
@@ -40,8 +42,7 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.OK).body(adminData);
 
         } catch (RuntimeException e) {
-            System.err.println("管理者儀表板錯誤: " + e.getMessage());
-            e.printStackTrace();
+            log.error("管理者儀表板錯誤", e);
 
             response.put("message", "伺服器錯誤：無法取得儀表板數據");
             response.put("error", e.getMessage());

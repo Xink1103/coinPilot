@@ -2,10 +2,12 @@ package com.finance.service;
 
 import com.finance.entity.User;
 import com.finance.repository.UserDAO;
+import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class UserService {
 
@@ -16,7 +18,7 @@ public class UserService {
         try {
             // 檢查帳號是否已存在
             if (userDAO.findUserByEmail(user.getUserEmail()) != null) {
-                System.err.println("帳號已存在，重複註冊");
+                log.warn("帳號已存在，重複註冊");
                 return false;
             }
 
@@ -32,7 +34,7 @@ public class UserService {
             return true;
 
         } catch (RuntimeException e) {
-            System.err.println("註冊過程發生問題: " + e.getMessage());
+            log.error("註冊過程發生問題", e);
             return false;
         }
     }
@@ -55,7 +57,7 @@ public class UserService {
             }
 
         } catch (RuntimeException e) {
-            System.err.println("登入過程發生問題: " + e.getMessage());
+            log.error("登入過程發生問題", e);
         }
         return null;
     }
@@ -75,7 +77,7 @@ public class UserService {
             return user;
 
         } catch (RuntimeException e) {
-            System.err.println("伺服器錯誤: " + e.getMessage());
+            log.error("透過 email 查詢使用者失敗", e);
         }
         return null;
     }
@@ -95,7 +97,7 @@ public class UserService {
             return user;
 
         } catch (RuntimeException e) {
-            System.err.println("透過 userId 查詢使用者時發生伺服器錯誤: " + e.getMessage());
+            log.error("透過 userId 查詢使用者失敗", e);
         }
         return null;
     }

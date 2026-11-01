@@ -3,9 +3,11 @@ package com.finance.service;
 import com.finance.entity.User;
 import com.finance.entity.UserSurvey;
 import com.finance.repository.UserSurveyDAO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class UserSurveyService {
 
@@ -22,8 +24,7 @@ public class UserSurveyService {
             return surveyId;
         } else {
             // 錯誤：問卷已存在，禁止重複 POST
-            System.err.println(
-                    "使用者 " + survey.getUserId() + " 試圖重複提交問卷，ID: " + surveyExist.getSurveyId());
+            log.warn("使用者 {} 試圖重複提交問卷，ID: {}", survey.getUserId(), surveyExist.getSurveyId());
             throw new IllegalStateException("問卷已存在，請勿重複提交或先執行刪除操作。");
         }
     }
@@ -45,7 +46,7 @@ public class UserSurveyService {
             int deletedCount = userSurveyDAO.deleteByUserId(userId);
             return deletedCount > 0;
         } catch (RuntimeException e) {
-            System.err.println("刪除問卷失敗: " + e.getMessage());
+            log.error("刪除問卷失敗", e);
             throw e;
         }
     }

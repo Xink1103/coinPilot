@@ -176,7 +176,7 @@ public class ExternalPriceService {
                 log.info("外幣匯率抓取成功");
             }
         } catch (Exception e) {
-            System.err.println("外幣 API 失敗: " + e.getMessage());
+            log.error("外幣 API 失敗", e);
         }
 
         return targetPrices;
@@ -190,7 +190,7 @@ public class ExternalPriceService {
             Map<String, Object> response = restTemplate.getForObject(STOCK_URL, Map.class);
 
             if (response == null || !response.containsKey("msgArray")) {
-                System.err.println("台股 API 回應異常");
+                log.error("台股 API 回應異常");
                 return stockPrices;
             }
 
@@ -198,7 +198,7 @@ public class ExternalPriceService {
                     (List<Map<String, Object>>) response.get("msgArray");
 
             if (msgArray == null || msgArray.isEmpty()) {
-                System.err.println("台股 msgArray 為空（可能非交易時間）");
+                log.warn("台股 msgArray 為空（可能非交易時間）");
                 return stockPrices;
             }
 
@@ -229,7 +229,7 @@ public class ExternalPriceService {
             log.info("台股抓取成功 : {} 檔", stockPrices.size());
 
         } catch (Exception e) {
-            System.err.println("台股 API 失敗: " + e.getMessage());
+            log.error("台股 API 失敗", e);
         }
 
         return stockPrices;

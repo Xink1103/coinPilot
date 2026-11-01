@@ -7,9 +7,11 @@ import com.finance.repository.AdminDAO;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class AdminService {
 
@@ -96,7 +98,7 @@ public class AdminService {
         } catch (ArithmeticException e) {
             // 計算錯誤時設為 0
             user.setInvestmentRatio(0.0);
-            System.err.println("計算投資比例失敗 (User ID: " + user.getUserId() + "): " + e.getMessage());
+            log.error("計算投資比例失敗, userId={}", user.getUserId(), e);
         }
     }
 

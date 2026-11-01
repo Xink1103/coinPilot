@@ -7,9 +7,11 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import java.util.Date;
 import javax.crypto.SecretKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class JwtUtil {
 
@@ -69,7 +71,7 @@ public class JwtUtil {
                     .getPayload();
 
         } catch (Exception e) {
-            System.err.println("Token 驗證失敗: " + e.getMessage());
+            log.warn("Token 驗證失敗: {}", e.getMessage());
             return null;
         }
     }
